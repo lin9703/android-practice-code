@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 
 // 최상위 수준 속성
 // 1. 특정 클래스의 인스턴스를 생성하지 않고 바로 사용하므로 앱이 실행되는 동안 속성값을 계속 보존해야 할 때 사용
@@ -34,13 +35,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
 
+        // layout inflate해서 화면에 표출
         setContentView(R.layout.activity_main)
 
+        // QuizViewModel 인스턴스 연결
+        // ViewModelProvider는 ViewModel의 레즈스트리처럼 작동
+        // 1. 액티비티 인스턴스가 처음으로 QuizViewModel을 요청하면 새로운 QuizViewModel 인스터스 생성하고 반환
+        // 2. 장치 구성이 변경되어 새로 생성된 액티비티 인스턴스가 QuizViewModel을 요청하면 최초 생성되었던 인스턴스 반환
+        // 3. 액티비티 인스턴스 소멸 시 QuizViewModel 인스턴스도 메모리에서 제거
+        // 현재 액티비티와 연관된 ViewModelProvider 인스턴스 생성 및 반환
+        val provider: ViewModelProvider = ViewModelProvider(this)
+        // QuizViewModel 인스턴스 반환
+        val quizViewModel = provider.get(QuizViewModel::class.java)
+        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
+
+
+        // View 객체로 inflate된 위젯 참조 얻기
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
         questionTextView = findViewById(R.id.question_text_view)
 
+
+        // 리스너(이벤트에 응답하기 위해 생성하는 객체) 설정
         trueButton.setOnClickListener { view: View ->
             checkAnswer(true)
         }
@@ -55,6 +72,8 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
 
+
+        // Question 설정
         updateQuestion()
     }
 
