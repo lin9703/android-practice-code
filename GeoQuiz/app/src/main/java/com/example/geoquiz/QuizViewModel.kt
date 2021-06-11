@@ -18,4 +18,28 @@ class QuizViewModel : ViewModel() {
         super.onCleared()
         Log.d(TAG, "ViewModel instance about to be destryoed")
     }
+
+    var currentIndex = 0
+
+    private val questionBank = listOf(
+        Question(R.string.question_australia, true),
+        Question(R.string.question_oceans, true),
+        Question(R.string.question_mideast, false),
+        Question(R.string.question_africa, false),
+        Question(R.string.question_americas, true),
+        Question(R.string.question_asia, true)
+    )
+
+    // 문제의 정답 반환
+    val currentQuestionAnswer: Boolean
+        get() = questionBank[currentIndex].answer
+
+    // 문제의 텍스트 반환
+    val currentQuestionText: Int
+        get() = questionBank[currentIndex].textResId
+
+    // 다음 문제로 넘어가는 함수
+    fun moveToNext() {
+        currentIndex = ++currentIndex % questionBank.size
+    }
 }

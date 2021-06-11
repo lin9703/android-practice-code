@@ -21,15 +21,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextButton: Button
     private lateinit var questionTextView: TextView
 
-    private val questionBank = listOf(
-            Question(R.string.question_australia, true),
-            Question(R.string.question_oceans, true),
-            Question(R.string.question_mideast, false),
-            Question(R.string.question_africa, false),
-            Question(R.string.question_americas, true),
-            Question(R.string.question_asia, true)
-    )
-    private var currentIndex = 0
+    // 장점 1. by lazy 키워드를 사용하여 val 속성으로 선언
+    // -> 액티비티 인스턴스가 생성될 때 ViewModel 인스턴스 참조를 quizViewModel에 한 번만 저장
+    // 장점 2. by lazy 키워드를 사용하면 최초로 quizViewModel이 사용될 때까지 초기화 늦출 수 있다.
+    private val quizViewModel: QuizViewModel by lazy {
+        ViewModelProvider(this).get(QuizViewModel::class.java)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,16 +36,17 @@ class MainActivity : AppCompatActivity() {
         // layout inflate해서 화면에 표출
         setContentView(R.layout.activity_main)
 
-        // QuizViewModel 인스턴스 연결
-        // ViewModelProvider는 ViewModel의 레즈스트리처럼 작동
-        // 1. 액티비티 인스턴스가 처음으로 QuizViewModel을 요청하면 새로운 QuizViewModel 인스터스 생성하고 반환
-        // 2. 장치 구성이 변경되어 새로 생성된 액티비티 인스턴스가 QuizViewModel을 요청하면 최초 생성되었던 인스턴스 반환
-        // 3. 액티비티 인스턴스 소멸 시 QuizViewModel 인스턴스도 메모리에서 제거
-        // 현재 액티비티와 연관된 ViewModelProvider 인스턴스 생성 및 반환
-        val provider: ViewModelProvider = ViewModelProvider(this)
-        // QuizViewModel 인스턴스 반환
-        val quizViewModel = provider.get(QuizViewModel::class.java)
-        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
+
+//        // QuizViewModel 인스턴스 연결
+//        // ViewModelProvider는 ViewModel의 레즈스트리처럼 작동
+//        // 1. 액티비티 인스턴스가 처음으로 QuizViewModel을 요청하면 새로운 QuizViewModel 인스터스 생성하고 반환
+//        // 2. 장치 구성이 변경되어 새로 생성된 액티비티 인스턴스가 QuizViewModel을 요청하면 최초 생성되었던 인스턴스 반환
+//        // 3. 액티비티 인스턴스 소멸 시 QuizViewModel 인스턴스도 메모리에서 제거
+//        // 현재 액티비티와 연관된 ViewModelProvider 인스턴스 생성 및 반환
+//        val provider: ViewModelProvider = ViewModelProvider(this)
+//        // QuizViewModel 인스턴스 반환
+//        val quizViewModel = provider.get(QuizViewModel::class.java)
+//        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
 
 
         // View 객체로 inflate된 위젯 참조 얻기
@@ -67,8 +66,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         nextButton.setOnClickListener { view: View ->
-            currentIndex = ++currentIndex % questionBank.size
-
+            quizViewModel.moveToNext()
             updateQuestion()
         }
 
@@ -103,12 +101,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
-        val questionTextResId = questionBank[currentIndex].textResId
+        val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = questionBank.get(currentIndex).answer
+        val correctAnswer = quizViewModel.currentQuestionAnswer
 
         val messageResId = if (userAnswer == correctAnswer) {
             R.string.correct_toast
