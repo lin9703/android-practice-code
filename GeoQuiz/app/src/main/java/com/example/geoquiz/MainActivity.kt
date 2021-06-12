@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 // 1. 특정 클래스의 인스턴스를 생성하지 않고 바로 사용하므로 앱이 실행되는 동안 속성값을 계속 보존해야 할 때 사용
 // 2. 앱 전체에서 사용하는 상수를 정의할 대 유용
 private const val TAG = "MainActivity"
+private const val KEY_INDEX = "index"
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,6 +49,9 @@ class MainActivity : AppCompatActivity() {
 //        val quizViewModel = provider.get(QuizViewModel::class.java)
 //        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
 
+        // Bundle 객체에 저장된 값 있는지 확인 및 ViewModel의 변수에 값 입력
+        val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+        quizViewModel.initCurrentIndex(currentIndex)
 
         // View 객체로 inflate된 위젯 참조 얻기
         trueButton = findViewById(R.id.true_button)
@@ -88,6 +92,14 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         Log.d(TAG, "onPause() called")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.d(TAG, "onSaveInstanceState")
+
+        // currentIndex를 Bundle 객체에 저장
+        outState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
     override fun onStop() {
