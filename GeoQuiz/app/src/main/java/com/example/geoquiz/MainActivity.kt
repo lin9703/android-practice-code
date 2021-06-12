@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         // Bundle 객체에 저장된 값 있는지 확인 및 ViewModel의 변수에 값 입력
         val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
-        quizViewModel.currentIndex = currentIndex
+        quizViewModel.initCurrentIndex(currentIndex)
 
         // View 객체로 inflate된 위젯 참조 얻기
         trueButton = findViewById(R.id.true_button)
